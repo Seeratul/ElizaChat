@@ -96,7 +96,7 @@
                 const response = await fetch(channel.endpoint, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `authkey ${channel.authkey}`,
+                        'Authorization': `authkey ${channel.authkey}`, // inlcuding the authkey, otherwise network errors! 
                         'Content-Type': 'application/json',
                     },
                 });
@@ -104,7 +104,7 @@
                 if (!response.ok) {
                     const errorData = await response.json();
                     console.log(`Failed to fetch messages from channel ${channel.name}: ${errorData}`);
-                    //throw new Error(`Failed to fetch messages from channel ${channel.name}: ${errorData}`);
+                    throw new Error(`Failed to fetch messages from channel ${channel.name}: ${errorData}`);
                 }
 
                 const data = await response.json();
@@ -112,11 +112,12 @@
             } catch (error) {
                 console.log(error);
                 console.log(`Failed to fetch messages from channel ${channel.name}: ${error.message}`);
-                //throw new Error(`Failed to fetch messages from channel ${channel.name}: ${error.message}`);
+                throw new Error(`Failed to fetch messages from channel ${channel.name}: ${error.message}`);
             }
         };
 
         function ChannelContent({ selectedChannel }) {
+            // React component that shows the messages of a selected channels
             const [messages, setMessages] = React.useState([]);
             const [loading, setLoading] = React.useState(false);
             const [error, setError] = React.useState(null);
@@ -139,46 +140,7 @@
             fetchMessages();
             console.log("hi"); // works
             
-                //  var m = getMessages(selectedChannel);
-               // console.log(m)
-                // fetch selected channel
-               // fetch("http://vm146.rz.uni-osnabrueck.de/u037/channel.wsgi/") // university hub
-                //fetch(`/show?channel=${encodeURIComponent(selectedChannel.endpoint)}`)
-              //  fetch(encodeURIComponent(selectedChannel.endpoint))
-            //    fetch(selectedChannel.endpoint)
-            //         .then(response => {
-            //             if (!response.ok) {
-            //                 throw new Error("Failed to fetch messages");
-            //             }
-            //             return response.json();
-            //         })
-            //         .then(data => setMessages(data.messages))
-            //         .catch(err => setError(err.message))
-            //         .finally(() => setLoading(false));
              }, [selectedChannel]);
-           // export const getMessages = async (channel) => {
-        //         try {
-        //             const response = await fetch(channel.endpoint, {
-        //                 method: 'GET',
-        //                 headers: {
-        //                     'Authorization': authkey ${channel.authkey},
-        //                     'Content-Type': 'application/json',
-        //                 },
-        //             });
-
-        //             if (!response.ok) {
-        //                 // If the response has an error status, we throw a new error
-        //                 const errorData = await response.json();
-        //                 throw new Error(`Failed to fetch messages from channel ${channel.name}: ${errorData}`);
-        //             }
-
-        //             const data = await response.json();
-        //             return data;
-        //         } catch (error) {
-        //             console.log(error);
-        //             throw new Error(`Failed to fetch messages from channel ${channel.name}: ${error.message}`);
-        //         }
-        //  //   };
 
             // if no channel selected
             if (!selectedChannel) {
@@ -194,11 +156,13 @@
                     {loading && <p>Loading messages...</p>}
                     {error && <p style={{ color: 'red' }}>{error}</p>}
                     
+                     
                     <h3>Messages:</h3>
                     <ul>
+                        {console.log(messages)}
                         {messages.length > 0 ? (
                             messages.map((msg, index) => (
-                                <li key={index}>{msg.content} - <em>{msg.author}</em></li>
+                                <li key={index}>{msg.content} - <em>{msg.sender}</em></li>
                             ))
                         ) : (
                             <p>No messages available.</p>
@@ -210,8 +174,9 @@
     
 
         function App() {
-            const [selectedChannel, setSelectedChannel] = React.useState(null);
 
+            // handling of selected Channel
+            const [selectedChannel, setSelectedChannel] = React.useState(null);
             const handleSelectChannel = (channel) => {
                 setSelectedChannel(channel);
             };
