@@ -14,6 +14,29 @@
 
     <script type="text/babel">
 
+        function GetName(){
+            // React component that asks the user for name
+            const [name, setName] = React.useState("");
+
+            if (name){
+                return (
+                    <div>
+                        <h2>Hi {name}</h2>
+                    </div>
+                )
+            } else {
+                return (
+                    <div>
+                        <h2>Enter your name</h2>
+                        {
+                            // key code 13 is for enter key
+                        }
+                        <input type="text" onKeyDown={({key, target}) => key === 'Enter' && setName(target.value)} />
+                    </div>
+                )
+            }
+        }
+
         function ChannelList() {
             // React component that shows a channel list
             // content is fetched from the university hub (works only on university network, use VPN)
@@ -44,7 +67,9 @@
         // main code: render the ChannelList component, add more components here
         ReactDOM.render(
             <div>
-                <h1>Chat client: List of channels</h1>
+                <h1>Chat client HI AM I THERE</h1>
+                
+                <GetName />
                 <ChannelList />
             </div>,
             document.getElementById('root'));

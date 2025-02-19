@@ -94,6 +94,7 @@ def send_message():
     else:
         extra = message['extra']
     # filter profanity
+    # filter messages that dont contain "I" <- TODO 
     message['content'] = profanity.censor(message['content']) 
     # add message to messages
     messages = read_messages()
@@ -105,7 +106,6 @@ def send_message():
     save_messages(messages)
 
     # answer
-    
     answer_msg = answer_message(message)
     # add message to messages
     messages = read_messages()
