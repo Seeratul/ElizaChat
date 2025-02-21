@@ -109,6 +109,7 @@
                 }
 
                 const data = await response.json();
+                console.log("messages loaded");
                 return data;
             } catch (error) {
                 console.log(error);
@@ -127,6 +128,12 @@
             const [messages, setMessages] = React.useState([]);
             const [loading, setLoading] = React.useState(false);
             const [error, setError] = React.useState(null);
+
+            // const reset_form = async (e) => {
+            //     document.getElementById('content').value  = null;
+            //     document.getElementById('sender').value = null;
+
+            // }
 
             const handleSubmit = async (e) => {
                 e.preventDefault();
@@ -162,6 +169,8 @@
                     console.log(response)
                     console.log(response.ok)
                     const data = await response;//.json();
+                    document.getElementById('content').value = null;
+                    document.getElementById('sender').value = null;
                     console.log("message");
                     console.log(data);
                    // window.location.reload();
@@ -182,6 +191,8 @@
                             setMessages(data);
                     } catch (err) {
                         setError(err.message);
+                        throw new Error(`Failed to post message to channel ${selectedChannel.name}: ${err.message}`);
+
                     }
             };
 
@@ -212,7 +223,7 @@
                     <p>URL: {selectedChannel.endpoint}</p>
                     <p>Type of Service: {selectedChannel.type_of_service}</p>
                     
-                    {loading && <p>Loading messages...</p>}
+                   
                     {error && <p style={{ color: 'red' }}>{error}</p>}
                     
                      
@@ -239,6 +250,7 @@
                         <button onClick={ (e) => {
                             handleSubmit(e);
                             fetchMessages(e);
+                           // reset_form(e);
                         }}>Submit</button>
                     </form>
                 </div>
@@ -252,7 +264,7 @@
 
             // handling of selected Channel
             const [selectedChannel, setSelectedChannel] = React.useState(null);
-            const [messages, setMessages] = React.useState([]);
+          //  const [messages, setMessages] = React.useState([]);
 
             const handleSelectChannel = (channel) => {
                 setSelectedChannel(channel);
