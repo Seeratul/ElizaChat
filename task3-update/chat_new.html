@@ -67,6 +67,7 @@
 
         function ChannelList({ onSelectChannel }) {
             // React component that shows a list of channels
+
             const [channels, setChannels] = React.useState([]);
 
             React.useEffect(() => {
@@ -116,11 +117,62 @@
             }
         };
 
+    // show form with name and message fields and send form content via fetch API on submit
+      //  const handleSubmit = (e) => {
+        
         function ChannelContent({ selectedChannel }) {
             // React component that shows the messages of a selected channels
+
+            // definitions
             const [messages, setMessages] = React.useState([]);
             const [loading, setLoading] = React.useState(false);
             const [error, setError] = React.useState(null);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+
+                try {
+                    console.log("here0");
+                    console.log(selectedChannel.endpoint); // works
+                    
+                    const response = await fetch(selectedChannel.endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `authkey ${selectedChannel.authkey}`, // inlcuding the authkey, otherwise network errors! 
+                            'Content-Type': 'application/json',
+                        },
+                        // access form fields
+                        body: JSON.stringify({
+                            content: document.getElementById('content').value,
+                            sender: document.getElementById('sender').value,
+                            timestamp: new Date().toISOString()
+                        }),
+                    })
+
+
+                    console.log("here1")
+                    console.log(response)
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                       // console.log(`Failed to post message to channel ${selectedChannel.name}: ${errorData}`)
+                        throw new Error(`Failed to post message to channel ${selectedChannel.name}: ${errorData}`);
+                    }
+                    console.log("here2")
+                    console.log(response)
+                    console.log(response.ok)
+                    const data = await response;//.json();
+                    console.log("message");
+                    console.log(data);
+                    window.location.reload();
+                   // data = ;
+                    return data;
+                } catch (error) {
+                // console.log(error);
+                // console.log(`Failed to fetch messages from channel ${selectedChannel.name}: ${error.message}`);
+                    throw new Error(`Failed to post message to channel ${selectedChannel.name}: ${error.message}`);
+                }
+            };
            
             React.useEffect(() => {
                 if (!selectedChannel) return;
@@ -128,19 +180,22 @@
                 setLoading(true);
                 setError(null);
                 const fetchMessages = async () => {
-                try {
-                    const data = await getMessages(selectedChannel);
-                    setMessages(data);
-                } catch (err) {
-                    setError(err.message);
-                }
-            };
-            console.log(selectedChannel); // works
+                    try {
+                            const data = await getMessages(selectedChannel);
+                            setMessages(data);
+                    } catch (err) {
+                        setError(err.message);
+                    }
+                };
 
-            fetchMessages();
-            console.log("hi"); // works
+               // console.log(selectedChannel); // works
+
+                fetchMessages();
+               // console.log("hi"); // works
             
-             }, [selectedChannel]);
+                }, 
+                [selectedChannel]
+            );
 
             // if no channel selected
             if (!selectedChannel) {
@@ -168,10 +223,23 @@
                             <p>No messages available.</p>
                         )}
                     </ul>
+                    <form>  
+                        <label>
+                            Name:
+                            <input type="text" id="sender" />
+                        </label>
+                        <label>
+                            Message:
+                            <input type="text" id="content" />
+                        </label>
+                        <button onClick={handleSubmit}>Submit</button>
+                    </form>
                 </div>
+
             );
         }      
-    
+
+
 
         function App() {
 
