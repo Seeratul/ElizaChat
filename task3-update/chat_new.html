@@ -164,7 +164,7 @@
                     const data = await response;//.json();
                     console.log("message");
                     console.log(data);
-                    window.location.reload();
+                   // window.location.reload();
                    // data = ;
                     return data;
                 } catch (error) {
@@ -174,19 +174,23 @@
                 }
             };
            
+            const fetchMessages = async () => {
+                    
+                    try {
+                            const data = await getMessages(selectedChannel);
+                            console.log(data);
+                            setMessages(data);
+                    } catch (err) {
+                        setError(err.message);
+                    }
+            };
+
             React.useEffect(() => {
                 if (!selectedChannel) return;
 
                 setLoading(true);
                 setError(null);
-                const fetchMessages = async () => {
-                    try {
-                            const data = await getMessages(selectedChannel);
-                            setMessages(data);
-                    } catch (err) {
-                        setError(err.message);
-                    }
-                };
+                
 
                // console.log(selectedChannel); // works
 
@@ -232,7 +236,10 @@
                             Message:
                             <input type="text" id="content" />
                         </label>
-                        <button onClick={handleSubmit}>Submit</button>
+                        <button onClick={ (e) => {
+                            handleSubmit(e);
+                            fetchMessages(e);
+                        }}>Submit</button>
                     </form>
                 </div>
 
@@ -245,9 +252,13 @@
 
             // handling of selected Channel
             const [selectedChannel, setSelectedChannel] = React.useState(null);
+            const [messages, setMessages] = React.useState([]);
+
             const handleSelectChannel = (channel) => {
                 setSelectedChannel(channel);
             };
+
+
 
             return (
                 <div className="container">
