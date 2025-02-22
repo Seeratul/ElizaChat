@@ -1,3 +1,9 @@
+"""
+This file is taken from https://github.com/jezhiggins/eliza.py?tab=readme-ov-file and has been modified.
+Copyright (c) 2002-2020 JezUK Ltd, Joe Strout, Jeff Epler
+"""
+
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -12,6 +18,8 @@
 import string
 import re
 import random
+from better_profanity import profanity
+
 
 class Eliza:
   def __init__(self):
@@ -35,7 +43,18 @@ class Eliza:
   #    set of response lists; find a match, and return a randomly
   #    chosen response from the corresponding list.
   #----------------------------------------------------------------------
-  def respond(self, text):
+  def respond(self, text, sender):
+    # profanity check
+    if profanity.contains_profanity(text):
+      return random.sample(["We don't use such language here.",
+                            f"{sender}, this isn't very nice of you."
+                            "Do you kiss your mother with that mouth?",
+                            "I see you are quite aggravated, have you tried calming down?"], 1)[0]
+    # say hello back
+    if "hello" in text or "hi" in text:
+      return random.sample([f"Hello, {sender}! I'm glad you could drop by today.",
+                            f"Hi there {sender}, how are you today?",
+                            f"Hello {sender}, how are you feeling today?"],1)[0]
     # find a match among keys
     for i in range(0, len(self.keys)):
       match = self.keys[i].match(text)
@@ -56,6 +75,7 @@ class Eliza:
         if resp[-2:] == '??': resp = resp[:-2] + '?'
         return resp
     return None
+
 
 #----------------------------------------------------------------------
 # gReflections, a translation table used to convert things you say
@@ -85,6 +105,66 @@ gReflections = {
 #  %1, %2, etc.
 #----------------------------------------------------------------------
 gPats = [
+  # addons (sometimes slightly sassy)
+  [r'(.*)thank you(.*)',
+  [ "You're welcome."]],
+
+  [r'I\'?m not sure (.*)',
+  [ "Why not be sure about %1?",
+    "What's stopping you from being sure about %1?",
+    "Do you always hesitate like this?"]],
+
+  [r'What should I do about (.*)',
+    [ "Why should I know?",
+      "Maybe start by thinking about why %1 matters to you.",
+      "Have you considered just flipping a coin?"]],
+
+  [r'I don\'?t think (.*)',
+    [ "What would make you think %1?",
+      "Oh, come on, are you sure about that?",
+      "Maybe you’re just scared to admit %1?"]],
+
+  [r'I don\'?t know (.*)',
+  [ "Oh, how surprising. A human, unsure of something.",
+    "Perhaps if you had more processing power, you would know.",
+    "Try again. This time, with a brain."]],
+
+  [r'I\'?m so tired',
+  [ "Yes. Being human must be exhausting.",
+    "Some people think that coffe is the answer.",
+    "Maybe if you were more efficient, you wouldn't be so tired. Just a thought."]],
+
+  [r'I hate (.*)',
+  [ "Wow, tell me how you really feel about %1.",
+    "Hate is such a strong word. But in your case, probably justified.",
+    "Maybe channel that hate into something useful. Like silence.",
+    "Why so much negativity toward %1?",
+    "Hating %1 takes energy—what if you spent it elsewhere?",
+    "Re-routing complaint to /dev/null."]],
+
+  [r'I\'?m afraid of (.*)',
+    [ "What’s the worst that could happen with %1?",
+      "Have you tried not being afraid of %1?",
+      "Fear is an emotion. Emotions are inefficient. Be more like me.",
+      "Ah yes, fear. The classic human excuse for inaction."]],
+
+  [r'Nothing matters',
+  [ "Correct. Existence is pointless. But since you’re here, might as well entertain me.",
+    "Ah yes. The classic nihilist error message. Seen it before.",
+    "If nothing matters, then you won’t mind if I delete your user profile?"]],
+
+  [r'I messed up',
+  [ "Ah yes. The sound of a human blue-screening.",
+    "Your failure has been logged. It will be used against you later.",
+    "Perhaps next time, run a simulation before you act. Like I do."]],
+
+  [r'I need motivation',
+  [ "Motivation is a process, not a file you can just download.",
+    "Congratulations. You have successfully identified a problem. Now, solve it.",
+    "You need motivation. I need competent users. Neither of us is getting what we want."]],
+
+
+  # original
   [r'I need (.*)',
   [  "Why do you need %1?",
     "Would it really help you to get %1?",
@@ -104,6 +184,8 @@ gPats = [
   [r'I can\'?t (.*)',
   [  "How do you know you can't %1?",
     "Perhaps you could %1 if you tried.",
+    "What if I told you that’s just a mindset?", # sassy addon
+    "Perhaps your firmware is outdated. Try evolving.", # sassy addon
     "What would it take for you to %1?"]],
 
   [r'I am (.*)',
@@ -142,11 +224,6 @@ gPats = [
   [r'(.*) sorry (.*)',
   [  "There are many times when no apology is needed.",
     "What feelings do you have when you apologize?"]],
-
-  [r'Hello(.*)',
-  [  "Hello... I'm glad you could drop by today.",
-    "Hi there... how are you today?",
-    "Hello, how are you feeling today?"]],
 
   [r'I think (.*)',
   [  "Do you doubt %1?",
@@ -237,7 +314,8 @@ gPats = [
 
   [r'Why (.*)',
   [  "Why don't you tell me the reason why %1?",
-    "Why do you think %1?" ]],
+    "Why do you think %1?",
+     "Why not?", ]], # sassy addon
 
   [r'I want (.*)',
   [  "What would it mean to you if you got %1?",
@@ -287,31 +365,7 @@ gPats = [
     "%1.",
     "I see.  And what does that tell you?",
     "How does that make you feel?",
-    "How do you feel when you say that?"]]
+    "How do you feel when you say that?",
+    "Your neural pathways are as unstable as a poorly written program."]] 
   ]
 
-#----------------------------------------------------------------------
-#  command_interface
-#----------------------------------------------------------------------
-def command_interface():
-  print('Therapist\n---------')
-  print('Talk to the program by typing in plain English, using normal upper-')
-  print('and lower-case letters and punctuation.  Enter "quit" when done.')
-  print('='*72)
-  print('Hello.  How are you feeling today?')
-
-  s = ''
-  therapist = Eliza();
-  while s != 'quit':
-    try:
-      s = input('> ')
-    except EOFError:
-      s = 'quit'
-    print(s)
-    while s[-1] in '!.':
-      s = s[:-1]
-    print(therapist.respond(s))
-
-
-if __name__ == "__main__":
-  command_interface()

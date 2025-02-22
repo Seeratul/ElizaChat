@@ -24,7 +24,7 @@ app.app_context().push()  # create an app context before initializing db
 HUB_URL = 'http://localhost:5555'
 HUB_AUTHKEY = '1234567890'
 CHANNEL_AUTHKEY = '0987654321'
-CHANNEL_NAME = "ElizaChatChannel"
+CHANNEL_NAME = "Group Therapy with Eliza"
 CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
 CHANNEL_FILE = 'messages.json'
 CHANNEL_TYPE_OF_SERVICE = 'aiweb24:chat'
@@ -93,8 +93,9 @@ def send_message():
         extra = None
     else:
         extra = message['extra']
-    # filter profanity
-    # filter messages that dont contain "I" <- TODO 
+    # answer
+    answer_msg = answer_message(message)
+    # filter
     message['content'] = profanity.censor(message['content']) 
     # add message to messages
     messages = read_messages()
@@ -103,58 +104,50 @@ def send_message():
                      'timestamp': message['timestamp'],
                      'extra': extra,
                      })
+    # check overflow
+    messages = check_msg_overflow(messages)
     save_messages(messages)
 
-    # answer
-    answer_msg = answer_message(message)
     # add message to messages
     messages = read_messages()
     messages.append({'content': answer_msg['content'],
                      'sender': answer_msg['sender'],
                      'timestamp': answer_msg['timestamp'],
-                   #  'extra': extra,
                      })
     save_messages(messages)
 
     return "OK", 200
 
 def answer_message(msg):
-   # new_msg = {}
-    
-    if 'HI' in msg['content']: 
-        therapist = Eliza()
-        reply = therapist.respond(msg['content'])
-        new_msg = {'content': reply,
-                     'sender': "eliza",
-                     'timestamp': msg['timestamp'],
-                    # 'extra': extra,
-                     }
-    elif 'i' in msg['content']:
-        new_msg = {'content': "bla",
-                     'sender': "eliza",
-                     'timestamp': msg['timestamp'],
-                    # 'extra': extra,
-                     }
-    else:
+    therapist = Eliza()
+    reply = therapist.respond(msg['content'], msg['sender'])
+    new_msg = {'content': reply,
+                'sender': "Eliza",
+                'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+                    }
+    if new_msg['content'] == None: # if for whatever reason eliza fails
         new_msg = {'content': "I have nothing to say to that",
                 'sender': "eliza",
-                'timestamp': msg['timestamp'],
-            # 'extra': extra,
+                'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
                 }
     return new_msg
 
+def check_msg_overflow(messages, cap=50):
+    # delete old messages if cap of messages is reached
+    if len(messages) > cap:
+        messages.remove(messages[1]) # del 2nd msg (first is welcome msg and should stay!)
+        messages.remove(messages[2]) # del 3rd msg (make space for answer msg)
+    return messages
 
-def check_msg_age(messages):
-    for msg in messages:
-        # convert timestamp string to datetime
-        timestamp_string = msg['timestamp'] 
-        format_string = "%Y-%m-%dT%H:%M:%S.%f" # 2025-02-17T15:43:00.372228
-        datetime_msg = datetime.strptime(timestamp_string, format_string)
-        datetime_cur = datetime.now()
-        age = datetime_cur - datetime_msg
-        age_in_seconds = age.total_seconds()
-        if age_in_seconds >= 30:
-            messages.remove(msg)
+def welcome(messages):
+    # in case message file is empty send welcome message
+    if len(messages) == 0:
+        new_msg = {'content': "Welcome to the group therapy channel. I am the psychatrist Eliza. Please be nice to everyone and have a good time.",
+            'sender': "Eliza",
+            'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+            # 'extra': extra,
+                }
+        messages.append(new_msg)
     return messages
 
 def read_messages():
@@ -165,11 +158,11 @@ def read_messages():
         return []
     try:
         messages = json.load(f)
-        # go through messages
-        messages = check_msg_age(messages)
     except json.decoder.JSONDecodeError:
         messages = []
     f.close()
+    # in case message file is empty
+    messages = welcome(messages)
     return messages
 
 def save_messages(messages):
