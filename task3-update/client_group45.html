@@ -12,44 +12,77 @@
             justify-content: center;
             align-items: flex-start;
             height: 100vh;
+            width: 100vw;
             margin: 0;
             background-color: #f4f4f9;
         }
 
         .container {
             display: flex;
-            width: 100%;
-            height: 100%;
+            width: 100vw;  /* Full viewport width */
+            height: 100vh; /* Full viewport height */
+            overflow: hidden; /* Prevent resizing based on content */
+           /* width: 100%;
+            height: 100%; */
         }
 
         .left-panel {
-            width: 250px;
+            width: 25%; /* should take up a fourth of the screen */
+            flex: 1;
+            max-width: 25%;  /* should take up a fourth of the screen */
+            min-width: 25%;  /* should take up a fourth of the screen */
             background-color: #2c3e50;
             color: white;
             padding: 20px;
-            overflow-y: auto;
+            overflow-y: auto; /* Scroll if content overflows */
         }
 
         .right-panel {
-            flex-grow: 1;
+             /*flex-grow: 1;*/
+            flex: 2;
             padding: 20px;
             background-color: white;
             border-left: 2px solid #ddd;
+            overflow-y: auto; /* Scroll if content overflows */
         }
 
         ul {
             padding-left: 20px;
+            list-style: none; /* Removes bullets */
         }
 
-        li {
+        /* cursor behavior when in left panel -> switches to pointer */
+        .left-panel li {
             margin: 10px 0;
             cursor: pointer;
         }
 
+        /* when hovering over content in left panel change its display slightly */
+        .left-panel li:hover {
+            background-color: #34495e;
+            padding: 5px;
+        }
+
+        .left-panel li::before {
+            content: "▶"; /* Put symbol before channels to make them look "clickable" */
+            color: white;
+            margin-right: 10px;
+        }
+
+        
+
+        /*
+        li {
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        */
+        /*
         li:hover {
             background-color: #34495e;
             padding: 5px;
         }
+        */
 
         h2 {
             font-size: 1.5em;
