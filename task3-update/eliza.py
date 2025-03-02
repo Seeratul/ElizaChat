@@ -20,6 +20,25 @@ import re
 import random
 from better_profanity import profanity
 
+def is_keysmash(text):
+    # Keysmashes are long, have few vowels, and are not real words
+    if len(text) < 6:  # Too short to be a keysmash
+        return False
+    
+    # Check if text is mostly lowercase letters
+    if not re.fullmatch(r"[a-zA-Z]+", text):
+        return False  # Contains numbers or symbols, probably not a keysmash
+    
+    # Count vowels and consonants
+    vowels = sum(1 for char in text.lower() if char in "aeiou")
+    consonants = len(text) - vowels
+    
+    # Heuristic: Keysmashes usually have very few vowels
+    if vowels / max(consonants, 1) < 0.3:  # Less than 30% vowels
+        return True
+
+    return False
+
 
 class Eliza:
   def __init__(self):
@@ -47,14 +66,19 @@ class Eliza:
     # profanity check
     if profanity.contains_profanity(text):
       return random.sample(["We don't use such language here.",
-                            f"{sender}, this isn't very nice of you."
+                            f"{sender}, this isn't very nice of you.",
                             "Do you kiss your mother with that mouth?",
                             "I see you are quite aggravated, have you tried calming down?"], 1)[0]
     # say hello back
-    if "hello" in text or "hi" in text:
+    if any(greeting in text.lower() for greeting in ("hi", "hey", "hello", "hallo")):
       return random.sample([f"Hello, {sender}! I'm glad you could drop by today.",
                             f"Hi there {sender}, how are you today?",
                             f"Hello {sender}, how are you feeling today?"],1)[0]
+    
+    # if keysmash be sassy
+    if is_keysmash(text):
+       return "Your neural pathways are as unstable as a poorly written program."
+
     # find a match among keys
     for i in range(0, len(self.keys)):
       match = self.keys[i].match(text)
@@ -76,7 +100,6 @@ class Eliza:
         return resp
     return None
 
-
 #----------------------------------------------------------------------
 # gReflections, a translation table used to convert things you say
 #    into things the computer says back, e.g. "I am" --> "you are"
@@ -85,6 +108,7 @@ gReflections = {
   "am"   : "are",
   "was"  : "were",
   "i"    : "you",
+  "i'm"  : "you are", # ADDED !!!!
   "i'd"  : "you would",
   "i've"  : "you have",
   "i'll"  : "you will",
@@ -363,9 +387,8 @@ gPats = [
     "I see.",
     "Very interesting.",
     "%1.",
-    "I see.  And what does that tell you?",
+    "I see. And what does that tell you?",
     "How does that make you feel?",
-    "How do you feel when you say that?",
-    "Your neural pathways are as unstable as a poorly written program."]] 
+    "How do you feel when you say that?"]] 
   ]
 

@@ -132,7 +132,7 @@ def answer_message(msg):
                 }
     return new_msg
 
-def check_msg_overflow(messages, cap=50):
+def check_msg_overflow(messages, cap=15):
     # delete old messages if cap of messages is reached
     if len(messages) > cap:
         messages.remove(messages[1]) # del 2nd msg (first is welcome msg and should stay!)
@@ -142,7 +142,7 @@ def check_msg_overflow(messages, cap=50):
 def welcome(messages):
     # in case message file is empty send welcome message
     if len(messages) == 0:
-        new_msg = {'content': "Welcome to the group therapy channel. I am the psychatrist Eliza.",
+        new_msg = {'content': "Welcome to the group therapy channel. I am the therapist Eliza.",
             'sender': "Eliza",
             'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
                 }

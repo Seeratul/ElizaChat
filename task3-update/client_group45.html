@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple React App: Show Channels</title>
+    <title>Cool Retro Client</title>
     <style>
         /* Basic layout */
         body {
@@ -14,7 +14,41 @@
             height: 100vh;
             width: 100vw;
             margin: 0;
-            background-color: #f4f4f9;
+            background: hsl(156, 53%, 7%);
+            color: hsl(154 84% 70%);
+            text-shadow: 0 0 3px hsl(154 84% 70%);
+        }
+
+        .name-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid lightgreen;
+            border-radius: 8px;
+            padding: 20px;
+            background: hsl(156, 53%, 7%);
+            color: hsl(154 84% 70%);
+            box-shadow: 0 0 5px hsl(154 84% 70%);
+            width: 300px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .name-dialog header p {
+            font-size: 1.5rem; /* Makes the text bigger */
+            margin-bottom: 10px;
+        }
+
+        .name-dialog input {
+            background: hsl(154 50% 5%);
+            color: hsl(154 84% 70%);
+            font-size: 1.2rem;
+            padding: 8px;
+            border: 2px solid lightgreen;
+            border-radius: 4px;
+            width: 100%;
         }
 
         .container {
@@ -22,8 +56,6 @@
             width: 100vw;  /* Full viewport width */
             height: 100vh; /* Full viewport height */
             overflow: hidden; /* Prevent resizing based on content */
-           /* width: 100%;
-            height: 100%; */
         }
 
         .left-panel {
@@ -31,23 +63,39 @@
             flex: 1;
             max-width: 25%;  /* should take up a fourth of the screen */
             min-width: 25%;  /* should take up a fourth of the screen */
-            background-color: #2c3e50;
-            color: white;
+            background-color: hsl(158, 53%, 10%);
             padding: 20px;
-            overflow-y: auto; /* Scroll if content overflows */
+            overflow-y: auto; /* scroll if content overflows */
         }
 
         .right-panel {
             flex: 2;
             padding: 20px;
-            background-color: white;
+            /*background-color: white; */
+            background: hsl(156, 53%, 7%);
             border-left: 2px solid #ddd;
-            overflow-y: auto; /* Scroll if content overflows */
+            overflow-y: auto; /* scroll if content overflows */
+        }
+
+        .right-panel input {
+            background: hsl(156, 53%, 7%);
+            color: hsl(154 84% 70%);
+            border: 2px solid lightgreen;
+            border-radius: 4px;
+            width: 40%;
+        }
+
+        button {
+            background-color: hsl(158, 53%, 10%);
+            color:  hsl(154 84% 70%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
         ul {
             padding-left: 20px;
-            list-style: none; /* Removes bullets */
+            list-style: none; /* remove bullets before content*/
         }
 
         /* cursor behavior when in left panel -> switches to pointer */
@@ -56,32 +104,16 @@
             cursor: pointer;
         }
 
-        /* when hovering over content in left panel change its display slightly */
+        /* when hovering over content in left panel -> change its display slightly */
         .left-panel li:hover {
             background-color: #34495e;
             padding: 5px;
         }
-
+ 
         .left-panel li::before {
             content: "▶"; /* Put symbol before channels to make them look "clickable" */
-            color: white;
             margin-right: 10px;
         }
-
-        
-
-        /*
-        li {
-            margin: 10px 0;
-            cursor: pointer;
-        }
-        */
-        /*
-        li:hover {
-            background-color: #34495e;
-            padding: 5px;
-        }
-        */
 
         h2 {
             font-size: 1.5em;
@@ -96,6 +128,28 @@
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
     <script type="text/babel">
+
+        function NameDialog({ name, setName }) {
+            // React component that shows a form that asks for name
+            return (
+                <dialog open className="name-dialog">
+                    <article>
+                        <header>
+                            <p><strong>Hello and Welcome!</strong></p>
+                            <p><strong>First things first:</strong></p>
+                            <p><strong>What's your name?</strong></p>
+                        </header>
+                        <p>
+                            <input 
+                                type="text"
+                                onKeyDown={({ key, target }) => key === 'Enter' && setName(target.value)}
+                            />
+                        </p>
+                    </article>
+                </dialog>
+            );
+        }
+
 
         function ChannelList({ onSelectChannel }) {
             // React component that shows a list of channels
@@ -115,7 +169,7 @@
                     <ul>
                         {channels.map(channel => (
                             <li key={channel.id} onClick={() => onSelectChannel(channel)}>
-                                {channel.name} (URL: {channel.endpoint}, Type: {channel.type_of_service})
+                                {channel.name} 
                             </li>
                         ))}
                     </ul>
@@ -146,7 +200,7 @@
             }
         };
         
-        function ChannelContent({ selectedChannel }) {
+        function ChannelContent({ selectedChannel, name }) {
             // React component that shows the messages of a selected channels
 
             // variables
@@ -179,7 +233,7 @@
                         // access form fields
                         body: JSON.stringify({
                             content: document.getElementById('content').value,
-                            sender: document.getElementById('sender').value,
+                            sender: name,
                             timestamp: new Date().toISOString()
                         }),
                     })
@@ -189,7 +243,7 @@
                         throw new Error(`Failed to post message to channel ${selectedChannel.name}: ${errorData}`);
                     }
                     const data = await response;
-                    fetchMessages(); // fetch messages again to see submitted message appear 
+                    fetchMessages(); // fetch messages again to see submitted message appear!
                     // reset form
                     document.getElementById('content').value = null;
                     document.getElementById('sender').value = null;
@@ -211,25 +265,50 @@
 
             // if no channel selected
             if (!selectedChannel) {
-                return <div className="right-panel">Please select a channel to view its content.</div>;
+                return <div className="right-panel">
+                    <h2>Welcome {name}!</h2>
+                    Please select a channel to view its content and start messaging.
+                    </div>;
             }
 
             return (
                 <div className="right-panel">
                     <h2>{selectedChannel.name}</h2>
-                    <p>URL: {selectedChannel.endpoint}</p>
-                    <p>Type of Service: {selectedChannel.type_of_service}</p>
-                    
+                    <div style={{
+                        // channel info box
+                        border: '2px solid lightgreen',
+                        padding: '10px',
+                        borderRadius: '5px',
+                        maxWidth: '500px' 
+                    }}>
+                        <h3 style={{ margin: '0 0 10px 0', borderBottom: '1px solid lightgreen', paddingBottom: '5px' }}>
+                            Channel Info
+                        </h3>
+                        <p><strong>URL:</strong> {selectedChannel.endpoint}</p>
+                        <p><strong>Type of Service:</strong> {selectedChannel.type_of_service}</p>
+                        <p><strong>Number of Messages:</strong> {messages.length}</p>
+                    </div>
                    
                     {error && <p style={{ color: 'red' }}>{error}</p>}
-                    
-                     
+                
                     <h3>Messages:</h3>
-                    <ul>
+                        
+                    <ul style={{ padding: '10px', listStyleType: 'none' }}>
                         {console.log(messages)}
                         {messages.length > 0 ? (
                             messages.map((msg, index) => (
-                                <li key={index}>{msg.content} - <em>{msg.sender}</em></li>
+                                // format of msg -> sender: content - time (hour:minutes)
+                                <li key={index} style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>
+                                        <em>{msg.sender}</em>: {msg.content}
+                                    </span>
+                                    <span>
+                                        <em> 
+                                            {String(new Date(msg.timestamp).getHours()).padStart(2, '0')}: 
+                                            {String(new Date(msg.timestamp).getMinutes()).padStart(2, '0')} 
+                                        </em>
+                                    </span>
+                                </li>
                             ))
                         ) : (
                             <p>No messages available.</p>
@@ -237,11 +316,7 @@
                     </ul>
                     <form>  
                         <label>
-                            Name:
-                            <input type="text" id="sender" />
-                        </label>
-                        <label>
-                            Message:
+                            <em>{name}</em>:
                             <input type="text" id="content" />
                         </label>
                         <button onClick={ (e) => {
@@ -255,21 +330,31 @@
         }      
 
 
-
         function App() {
 
+            // constants
+            // name 
+            const [name, setName] = React.useState("");
             // handling of selected Channel
             const [selectedChannel, setSelectedChannel] = React.useState(null);
             const handleSelectChannel = (channel) => {
                 setSelectedChannel(channel);
             };
-
-            return (
-                <div className="container">
-                    <ChannelList onSelectChannel={handleSelectChannel} />
-                    <ChannelContent selectedChannel={selectedChannel} />
-                </div>
-            );
+            if (name) {
+                return <div className="container">
+                         <ChannelList onSelectChannel={handleSelectChannel} />
+                         <ChannelContent selectedChannel={selectedChannel} name={name}/>
+                       </div>
+                
+            } else {
+                return (
+                    <div className="name-dialog">
+                        <NameDialog name={name} setName={setName}/>
+                    </div>
+                );
+            }
+            
+        
         }
 
         // Render the App component
