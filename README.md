@@ -16,7 +16,7 @@ We used the code provided by Joe Strout, Jeff Epler and Jez Higgins that can be 
     - a Dune reference
 
 Functionality of the Channel:
-- old messages get deleted when its cap is reached (15 plus welcome message)
+- old messages get deleted when its cap is reached (25)
 - profanity is censored with [better_profanity](https://pypi.org/project/better-profanity/) 
 
 ## The React Client 
