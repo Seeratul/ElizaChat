@@ -132,7 +132,7 @@ def answer_message(msg):
                 }
     return new_msg
 
-def check_msg_overflow(messages, cap=15):
+def check_msg_overflow(messages, cap=25):
     # delete old messages if cap of messages is reached
     if len(messages) > cap:
         messages.remove(messages[1]) # del 2nd msg (first is welcome msg and should stay!)

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cool Retro Client</title>
     <style>
-        /* Basic layout */
+        /* Layout configs */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -31,7 +31,7 @@
             color: hsl(154 84% 70%);
             box-shadow: 0 0 5px hsl(154 84% 70%);
             width: 300px;
-            text-align: center;
+            text-align: center; 
             display: flex;
             align-items: center;
         }
@@ -71,9 +71,8 @@
         .right-panel {
             flex: 2;
             padding: 20px;
-            /*background-color: white; */
             background: hsl(156, 53%, 7%);
-            border-left: 2px solid #ddd;
+            border-left: 2px solid lightgreen;
             overflow-y: auto; /* scroll if content overflows */
         }
 
@@ -111,7 +110,7 @@
         }
  
         .left-panel li::before {
-            content: "▶"; /* Put symbol before channels to make them look "clickable" */
+            content: "▶"; /* put symbol before channels to make them look "clickable" */
             margin-right: 10px;
         }
 
@@ -135,9 +134,11 @@
                 <dialog open className="name-dialog">
                     <article>
                         <header>
-                            <p><strong>Hello and Welcome!</strong></p>
-                            <p><strong>First things first:</strong></p>
-                            <p><strong>What's your name?</strong></p>
+                            <p><strong>
+                                Hello and Welcome!<br />
+                                First things first:<br />
+                                What's your name?
+                            </strong></p>
                         </header>
                         <p>
                             <input 
@@ -210,11 +211,12 @@
             // Fetching Messages with getMessages()
             const fetchMessages = async () => {
                     try {
-                            const data = await getMessages(selectedChannel);
-                            console.log(data);
-                            setMessages(data);
+                        const data = await getMessages(selectedChannel);
+                        console.log(data);
+                        setMessages(data);
                     } catch (err) {
                         setError(err.message);
+                        setMessages([]); // reset messages! otherwise messages from prev selected channel get displayed!
                         throw new Error(`Failed to fetch messages from channel ${selectedChannel.name}: ${err.message}`);
                     }
             };
@@ -297,7 +299,7 @@
                         {console.log(messages)}
                         {messages.length > 0 ? (
                             messages.map((msg, index) => (
-                                // format of msg -> sender: content - time (hour:minutes)
+                                // format of msg -> sender: content - time (hour:minutes,day.month.year)
                                 <li key={index} style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
                                     <span>
                                         <em>{msg.sender}</em>: {msg.content}
@@ -305,7 +307,10 @@
                                     <span>
                                         <em> 
                                             {String(new Date(msg.timestamp).getHours()).padStart(2, '0')}: 
-                                            {String(new Date(msg.timestamp).getMinutes()).padStart(2, '0')} 
+                                            {String(new Date(msg.timestamp).getMinutes()).padStart(2, '0')}, 
+                                            {String(new Date(msg.timestamp).getDay()).padStart(2, '0')}.
+                                            {String(new Date(msg.timestamp).getMonth()).padStart(2, '0')}.
+                                            {String(new Date(msg.timestamp).getFullYear()).padStart(2, '0')}
                                         </em>
                                     </span>
                                 </li>
@@ -321,19 +326,16 @@
                         </label>
                         <button onClick={ (e) => {
                             handleSubmit(e);
-                            
                         }}>Submit</button>
                     </form>
                 </div>
-
             );
         }      
 
 
         function App() {
 
-            // constants
-            // name 
+            // user name 
             const [name, setName] = React.useState("");
             // handling of selected Channel
             const [selectedChannel, setSelectedChannel] = React.useState(null);
@@ -345,7 +347,6 @@
                          <ChannelList onSelectChannel={handleSelectChannel} />
                          <ChannelContent selectedChannel={selectedChannel} name={name}/>
                        </div>
-                
             } else {
                 return (
                     <div className="name-dialog">
@@ -353,8 +354,6 @@
                     </div>
                 );
             }
-            
-        
         }
 
         // Render the App component

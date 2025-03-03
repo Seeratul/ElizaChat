@@ -161,15 +161,14 @@ gPats = [
   [r'I hate (.*)',
   [ "Wow, tell me how you really feel about %1.",
     "Hate is such a strong word. But in your case, probably justified.",
-    "Maybe channel that hate into something useful. Like silence.",
+    "Maybe channel that hate into something useful.",
     "Why so much negativity toward %1?",
-    "Hating %1 takes energy—what if you spent it elsewhere?",
-    "Re-routing complaint to /dev/null."]],
+    "Hating %1 takes energy—what if you spent it elsewhere?"]],
 
   [r'I\'?m afraid of (.*)',
     [ "What’s the worst that could happen with %1?",
       "Have you tried not being afraid of %1?",
-      "Fear is an emotion. Emotions are inefficient. Be more like me.",
+      "Fear is the mind-killer. Fear is the little-death that brings total obliteration. Face your fear. Permit it to pass over you and through you.",
       "Ah yes, fear. The classic human excuse for inaction."]],
 
   [r'Nothing matters',
