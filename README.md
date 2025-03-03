@@ -1,38 +1,33 @@
 # ElizaChat
 
-https://github.com/jezhiggins/eliza.py?tab=readme-ov-file
+Repo for ElizaChat Channel and matching React Client
 
+## The Channel
 
+Our channel is a group therapy with [ELIZA](https://en.wikipedia.org/wiki/ELIZA) as the therapist. 
 
+We used the code provided by Joe Strout, Jeff Epler and Jez Higgins that can be found [here](https://github.com/jezhiggins/eliza.py/blob/main/eliza.py) and added some slight changes to make the conversation a bit more interesting:
+- Eliza now responds to profanity which is flagged with the [better_profanity](https://pypi.org/project/better-profanity/) library.
+- Eliza now greets users with their name.
+- Eliza got a few addons for responses:
+    - translating an "i'm" from a user to a "you are" from Eliza which proofed to be essential for conversation flow
+    - a custom response to a keysmash
+    - a few sassy GLaDOS-style comebacks
+    - a Dune reference
 
-# what we did 
+Functionality of the Channel:
+- old messages get deleted when its cap is reached (15 plus welcome message)
+- profanity is censored with [better_profanity](https://pypi.org/project/better-profanity/) 
 
-## Changes to Eliza
-- responds to profanity
-- greets user back with name
-- a few addons for responses
+## The React Client 
+The client fits the retro theme of Eliza and is modelled after a display of a CRT monitor.
 
+Functionality of the Client: 
+- displays channel info in info box
+- displays messages in a quickly readable format  
+- asks user for name and reuses it for all channels until reload
+- does not reload page/scroll back up upon posting a new message
+  
 
-# todo
-## task 1
-- messages only get deleted on refresh/ new msg
-- filter content for being off-topic
-- deploy
-
-## task 2
-The client has to include all functionality of the flask client included in the code but does not need any server code.
-- has to list all channels (already done)
-- click on channel and have different view where we see channel
-- post messages in channel 
-The flask client is very simplistic. Make your React client fancier, somehow.
-- 
-Add extra functionality to the client, e.g.:
-Prompt for the user name only once and the reuse it (either only for this session or also after reloading or restarting the browser)
-Build a search function that searches all channels.
-Enable formatting like [nop]_word_[/nop| for bold face and [nop]*word*[/nop] for italics
-Use the extra field to add some special functions together with your channel (e.g., display buttons to generate an answer)
-Add an activity indicator to the channel list, showing the number of unread messages. The indicator should update continuously in the background.
-If you are curious and want to invest a bit more, think of a usecase for tensorflow in the browser, (cf. https://www.tensorflow.org/js ) and implement it for your client
-The client is deployed on a university server and works with the public hab and the channels registered there.
  
 
