@@ -391,3 +391,4 @@ gPats = [
     "How do you feel when you say that?"]] 
   ]
 
+
